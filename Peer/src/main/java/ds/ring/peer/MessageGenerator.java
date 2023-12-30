@@ -16,14 +16,27 @@ public class MessageGenerator implements Runnable{
     }
 
     public void run() {
-        PoissonProcess pp = new PoissonProcess(20, new Random(0) );
+        PoissonProcess pp = new PoissonProcess(4, new Random(0) );
         for (int i = 1; i <= SAMPLES; i++) {
             double t = pp.timeForNextEvent() * 60.0 * 1000.0;
             System.out.println("next event in -> " + (int)t + " ms");
             try {
                 Thread.sleep((int)t);
-                messageQueue.add("add:1:2\n");
-                System.out.println("added message to queue");
+                int op = (int)(Math.random() * 4);
+                switch (op) {
+                    case 0:
+                        messageQueue.add(String.format("add:%d:%d\n", (int)(Math.random() * 100), (int)(Math.random() * 100)));
+                        break;
+                    case 1:
+                        messageQueue.add(String.format("sub:%d:%d\n", (int)(Math.random() * 100), (int)(Math.random() * 100)));
+                        break;
+                    case 2:
+                        messageQueue.add(String.format("mul:%d:%d\n", (int)(Math.random() * 100), (int)(Math.random() * 100)));
+                        break;
+                    case 3:
+                        messageQueue.add(String.format("div:%d:%d\n", (int)(Math.random() * 100), (int)(Math.random() * 100)));
+                        break;
+                }
             }
             catch (InterruptedException e) {
                 System.out.println("thread interrupted");

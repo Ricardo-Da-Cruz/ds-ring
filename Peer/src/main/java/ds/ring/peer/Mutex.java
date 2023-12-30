@@ -1,5 +1,6 @@
 package ds.ring.peer;
 
+import javax.swing.plaf.TableHeaderUI;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -7,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 
@@ -34,15 +36,15 @@ public class Mutex implements Runnable {
         Socket socket;
         while (!connected) {
             try {
-                System.out.println("Attempting to connect to the server...");
+                System.out.println("Attempting to establish connection...");
                 socket = new Socket(address, 5000);
                 connected = true;
-                System.out.println("Connected to the server successfully!");
+                System.out.println("Connected successfully!");
                 return socket;
             } catch (UnknownHostException e) {
                 System.err.println("Error: Unknown host " + address);
             } catch (IOException e) {
-                System.err.println("Error: Failed to connect to the server");
+                System.err.println("Error: Failed to connect");
                 try {
                     Thread.sleep(3000); // Wait for 3 seconds before retrying
                 } catch (InterruptedException ex) {
@@ -65,21 +67,18 @@ public class Mutex implements Runnable {
             while (true){
                 Thread.sleep(1000);
                 if (hasMutex){
-                    System.out.println("has mutex");
-                    System.out.println("sending " + messages.size() +" messages");
                     while (!messages.isEmpty()){
                         String message = messages.remove();
-                        System.out.println("sending message: " + message);
                         serverOut.write(message);
                         serverOut.flush();
-                        message = serverIn.readLine();
-                        if (message == null){
+                        String response = serverIn.readLine();
+                        if (response == null){
                             System.out.println("Server disconnected");
                             break;
                         }
-                        System.out.println("Server response: " + message);
+                        System.out.printf("sent: %s, received: %s\n", message, response);
                     }
-                    System.out.println("sending token");
+                    System.out.println("sending token to " + nextClient.getInetAddress());
                     tokenOut.write("token\n");
                     tokenOut.flush();
                     hasMutex = false;
@@ -90,10 +89,11 @@ public class Mutex implements Runnable {
                         System.out.println("Server disconnected");
                         break;
                     }else if (message.equals("token")) {
-                        System.out.println("received token");
+                        System.out.println("received token at " + Instant.now());
                         hasMutex = true;
                     }else{
                         System.out.println("received token: " + message);
+                        break;
                     }
                 }
             }
