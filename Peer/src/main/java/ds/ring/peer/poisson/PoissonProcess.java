@@ -1,4 +1,4 @@
-package ds.poisson;
+package ds.ring.peer.poisson;
 
 import java.util.Random;
 

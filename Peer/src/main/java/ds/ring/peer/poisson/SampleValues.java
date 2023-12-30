@@ -1,4 +1,4 @@
-package ds.poisson;
+package ds.ring.peer.poisson;
 
 public class SampleValues {
 

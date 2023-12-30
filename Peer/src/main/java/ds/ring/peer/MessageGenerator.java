@@ -1,8 +1,9 @@
 package ds.ring.peer;
 
-import java.util.concurrent.BlockingQueue;
-import ds.poisson.*;
+import ds.ring.peer.poisson.PoissonProcess;
 
+import java.util.Iterator;
+import java.util.concurrent.BlockingQueue;
 import java.lang.Thread;
 import java.util.Random;
 public class MessageGenerator implements Runnable{
@@ -21,7 +22,8 @@ public class MessageGenerator implements Runnable{
             System.out.println("next event in -> " + (int)t + " ms");
             try {
                 Thread.sleep((int)t);
-                messageQueue.add("message " + i);
+                messageQueue.add("add:1:2\n");
+                System.out.println("added message to queue");
             }
             catch (InterruptedException e) {
                 System.out.println("thread interrupted");
